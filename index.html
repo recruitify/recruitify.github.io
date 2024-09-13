@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Cookie Stripe Fees Calculator</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous"> 
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <style>
+    .payment-split {
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .payment-split .card-header {
+      background-color: #e8cfcf;
+      padding: 10px;
+    }
+
+    .payment-split .list-group-item {
+      padding: 8px 15px;
+    }
+
+    .card-header.bg-primary {
+      background-color: #4242DB!important; 
+      color: white;
+    }
+    .card-header.bg-secondary {
+      background-color: #A0A0ED!important;
+      color: white;
+    }
+    #paymentSplitsContainer .card {
+      margin-right: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container mt-3">
+    <div class="container  mt-3 mb-4 d-flex justify-content-between align-items-center">
+       <svg width="200" viewBox="0 0 150 36" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-component __icon -auto __logo" data-v-4347082d="" data-v-74e114dc=""><g id="Clip path group"><mask id="mask0_981_11555" style="mask-type:luminance;" maskUnits="userSpaceOnUse" x="0" y="0" width="150" height="36"><g id="clip0_317_150"><path id="Vector" d="M150 0.75H0V35.25H150V0.75Z" fill="white"></path></g></mask><g mask="url(#mask0_981_11555)"><g id="Group"><path id="Vector_2" d="M53.4394 22.0125C52.428 23.6478 50.5948 24.6226 48.6667 24.5598C45.5377 24.5598 43.2619 22.1382 43.2619 18.7732C43.2619 15.3768 45.4744 12.9867 48.6667 12.9867C50.5317 12.9238 52.3015 13.8358 53.3446 15.4082L53.724 15.9429L56.8848 12.798L56.6002 12.4206C54.7354 9.8418 51.9856 8.4895 48.6667 8.4895C42.7246 8.4895 38.2363 12.9238 38.2363 18.8047C38.2363 24.78 42.6298 29.1198 48.6667 29.1198C52.0171 29.1198 54.9883 27.5475 56.6319 24.9057L56.8531 24.5283L53.7871 21.4149L53.4394 22.0125Z" fill="#4242DB"></path><path id="Vector_3" d="M68.3575 8.51166C62.3519 8.51166 57.9902 12.8516 57.9902 18.8269C57.9902 24.8021 62.3519 29.1421 68.3575 29.1421C74.2679 29.1421 78.7562 24.7078 78.7562 18.8269C78.7879 16.0594 77.7448 13.4176 75.7852 11.4678C73.7939 9.51801 71.1073 8.44875 68.3575 8.51166ZM73.6991 18.7639C73.6991 22.1603 71.4865 24.5506 68.3575 24.5506C65.2598 24.5506 63.0158 22.129 63.0158 18.7639C63.0158 15.3675 65.2283 12.9774 68.3575 12.9774C71.4865 12.9774 73.6991 15.3675 73.6991 18.7639Z" fill="#4242DB"></path><path id="Vector_4" d="M90.8614 8.51166C84.856 8.51166 80.4941 12.8516 80.4941 18.8269C80.4941 24.8021 84.856 29.1421 90.8614 29.1421C96.772 29.1421 101.26 24.7078 101.26 18.8269C101.292 16.0594 100.249 13.4176 98.2891 11.4678C96.2978 9.51801 93.6112 8.44875 90.8614 8.51166ZM96.203 18.7639C96.203 22.1603 93.9905 24.5506 90.8614 24.5506C87.7639 24.5506 85.5197 22.129 85.5197 18.7639C85.5197 15.3675 87.7322 12.9774 90.8614 12.9774C94.0222 12.9774 96.203 15.3675 96.203 18.7639Z" fill="#4242DB"></path><path id="Vector_5" d="M119.119 11.7256C119.119 11.0023 119.088 10.279 119.024 9.55564L118.961 9.08391H114.062L114.125 9.71289C114.22 10.3733 114.252 11.0337 114.22 11.6627C114.22 14.7447 112.229 16.663 109.036 16.663C108.752 16.663 108.467 16.663 108.183 16.663V0.75H103.221V28.5507H108.183V21.0658C108.531 21.0973 108.878 21.0973 109.163 21.0973C109.637 21.0973 110.079 21.0658 110.554 21.0345L114.852 28.582H120.51L115.2 19.5877C117.729 17.9839 119.119 15.2164 119.119 11.7256Z" fill="#4242DB"></path><path id="Vector_6" d="M125.282 1.50415C123.702 1.5356 122.438 2.825 122.438 4.39743C122.469 5.96987 123.765 7.22781 125.345 7.22781C126.926 7.19637 128.19 5.93841 128.19 4.36598C128.19 2.79354 126.926 1.50415 125.345 1.50415C125.345 1.50415 125.314 1.50415 125.282 1.50415Z" fill="#4242DB"></path><path id="Vector_7" d="M127.781 9.08984H122.818V28.5566H127.781V9.08984Z" fill="#4242DB"></path><path id="Vector_8" d="M147.282 11.4757C145.48 9.55729 142.951 8.48803 140.296 8.51947C134.323 8.51947 129.992 12.8594 129.992 18.8347C129.992 24.8099 134.354 29.1499 140.391 29.1499C143.773 29.1499 146.46 27.8605 148.388 25.3132L148.672 24.9358L145.67 21.8537L145.29 22.357C144.058 23.9294 142.509 24.6527 140.454 24.6527C137.799 24.6527 135.934 23.269 135.302 20.8159H149.779L149.873 20.3756C149.968 19.8725 150 19.3693 150 18.8662C149.937 15.9413 148.988 13.3311 147.282 11.4757ZM135.239 16.8848C135.871 14.4318 137.736 12.9852 140.201 12.9852C142.604 12.9852 144.437 14.4947 144.911 16.8848H135.239Z" fill="#4242DB"></path><path id="Vector_9" d="M10.1374 18.8165C10.1374 15.3112 12.9934 12.4696 16.5165 12.4696C18.2502 12.4696 19.8223 13.1578 20.9722 14.2746C21.6301 14.9137 22.7284 15.0737 23.3787 14.4268L28.4728 9.35828C28.975 8.85853 29.0214 8.05739 28.5339 7.54324C25.5223 4.36615 21.2521 2.38306 16.5165 2.38306C7.39467 2.38306 0 9.74059 0 18.8165C0 27.8926 7.39467 35.25 16.5165 35.25C21.2616 35.25 25.5393 33.2591 28.5519 30.0709C29.0379 29.5565 28.9911 28.7565 28.4893 28.2574L23.3962 23.1898C22.7445 22.5412 21.6426 22.7038 20.9847 23.3462C19.8339 24.4703 18.2565 25.1634 16.5165 25.1634C12.9934 25.1634 10.1374 22.3219 10.1374 18.8165Z" fill="#4242DB"></path><path id="Vector_10" d="M23.1016 18.7995C23.1016 19.1722 23.2504 19.5298 23.5153 19.7934L29.5361 25.7839C30.1804 26.4249 31.2619 26.2836 31.6303 25.4545C31.7443 25.1977 31.852 24.9376 31.9529 24.6742C32.6509 22.8546 33.0331 20.88 33.0331 18.8164C33.0331 18.5328 33.0259 18.2509 33.0116 17.9709C32.9216 16.2039 32.5511 14.5106 31.9435 12.9341C31.925 12.8862 31.9064 12.8384 31.8875 12.7907C31.8023 12.5759 31.7128 12.3633 31.619 12.1531C31.2496 11.3254 30.1691 11.1851 29.5256 11.8255L23.5153 17.8056C23.2504 18.0691 23.1016 18.4267 23.1016 18.7995Z" fill="#8783DF"></path></g></g></g></svg>
+      <h4 class="text-center mb-4">Cookie Stripe Fees Calculator</h4>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        <div class="card">
+          <div class="card-header bg-primary">Input</div>
+          <div class="card-body">
+            <form>
+              <div class="form-group">
+                <label for="invoiceAmount">Invoice Amount:</label>
+                <input type="number" id="invoiceAmount" class="form-control"   
+   value="">
+              </div>
+              <div class="form-group">
+                <label for="paymentSplits">Number of Payment Splits:</label>
+                <input type="number" id="paymentSplits" class="form-control" value="0">
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-9">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header bg-primary">Totals</div>
+              <div class="card-body">
+                <table class="table">
+                  <tbody>
+                    <tr>
+                      <th>Stripe Fees Amount:</th>
+                      <td><span id="stripeFeesAmount"></span></td>
+                    </tr>
+                    <tr>
+                      <th>Cookie Fee Amount:</th>
+                      <td><span id="cookieFeeAmount"></span></td>
+                    </tr>
+                    <tr>
+                      <th>Total Fees:</th>
+                      <td><span id="totalFees"></span></td>
+                    </tr>
+                    <tr>
+                      <th>Total Final Amount:</th>
+                      <td><span id="totalFinalAmount" class="fw-bold"></span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header bg-primary">Percentage Fees</div>
+              <div class="card-body">
+                <table class="table">
+                  <tbody>
+                    <tr>
+                      <th>Stripe Commission:</th>
+                      <td><span id="stripeCommissionRate">2.90%</span></td>
+                    </tr>
+                    <tr>
+                      <th>Stripe Fixed Fee:</th>
+                      <td><span id="stripeFixedFee">$0.30</span></td>
+                    </tr>
+                    <tr>
+                      <th>Cookie Fee:</th>
+                      <td><span id="cookieFeeRate">1.46%</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p></p>
+      <p></p>
+      <div class="row">
+        <div class="col-md-12">
+          <div id="paymentSplitsContainer" class="row row-cols-auto g-3"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    function roundUp(num, places) {
+      const factor = 10 ** places;
+      return Math.ceil(num * factor) / factor;
+    }
+
+    $(document).ready(function() {
+      $("#invoiceAmount, #paymentSplits").on("input", function() {
+  var invoiceAmount = parseFloat($("#invoiceAmount").val());
+  var paymentSplits = parseInt($("#paymentSplits").val());
+
+  var stripeCommissionRate = 0.029;
+  var stripeFixedFee = 0.30;
+  var cookieFeeRate = 0.0146;
+
+  var totalFeeRate = stripeCommissionRate + cookieFeeRate;
+  var finalAmount = roundUp(invoiceAmount / (1 - totalFeeRate), 2);
+  var stripeFeesAmount = roundUp(stripeCommissionRate * finalAmount + stripeFixedFee, 2);
+  var cookieFeeAmount = roundUp(cookieFeeRate * finalAmount, 2);
+  var totalFees = roundUp(stripeFeesAmount + cookieFeeAmount , 2);
+  var totalFinalAmount = roundUp(invoiceAmount + totalFees, 2);
+
+  // Update totals section
+  $("#stripeFeesAmount").text("$" + stripeFeesAmount.toFixed(2));
+  $("#cookieFeeAmount").text("$" + cookieFeeAmount.toFixed(2));
+  $("#totalFees").text("$" + totalFees.toFixed(2));
+  $("#totalFinalAmount").text("$" + totalFinalAmount.toFixed(2));
+
+  // Update payment splits container
+  $("#paymentSplitsContainer").empty();
+  var splitInvoiceAmount = invoiceAmount / paymentSplits;
+  for (var i = 1; i <= paymentSplits; i++) {
+    var splitTotalFeeRate = stripeCommissionRate + cookieFeeRate;
+    var splitFinalAmount = roundUp(splitInvoiceAmount / (1 - totalFeeRate), 2);
+    var splitStripeFeesAmount = roundUp(stripeCommissionRate * splitFinalAmount + stripeFixedFee, 2);
+    var splitCookieFeeAmount = roundUp(cookieFeeRate * splitFinalAmount, 2);
+    var splitTotalFees = roundUp(splitStripeFeesAmount + splitCookieFeeAmount , 2);
+    var splitTotalFinalAmount = roundUp(splitInvoiceAmount + splitTotalFees, 2);
+
+    $("#paymentSplitsContainer").append(`
+      <div class="card payment-split">
+        <div class="card-header bg-secondary">Payment Split ${i}</div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">Invoice Amount: $${splitInvoiceAmount.toFixed(2)}</li>
+          <li class="list-group-item">Stripe Fees: $${splitStripeFeesAmount.toFixed(2)}</li>
+          <li class="list-group-item">Cookie Fee: $${splitCookieFeeAmount.toFixed(2)}</li>
+          <li class="list-group-item">Total Fees: $${splitTotalFees.toFixed(2)}</li>
+          <li class="list-group-item">Total Final Amount: $${splitTotalFinalAmount.toFixed(2)}</li>
+        </ul>
+      </div>
+    `);
+  }
+});
+    });
+  </script>
+</body>
+</html>
