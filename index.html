@@ -246,10 +246,10 @@
           var splitTotalFees = roundUp(splitStripeFeesAmount + splitCookieFeeAmount);
           var splitTotalFinalAmount = splitInvoiceAmount + splitTotalFees;
 
-          var splitStripeFeesAmountFixed = roundUp(splitTotalFinalAmount - splitCookieFeeAmount) - splitInvoiceAmount;
-          var splitTotalFeesFixed = splitStripeFeesAmountFixed + splitCookieFeeAmount;
+          splitStripeFeesAmount = roundUp(splitTotalFinalAmount - splitCookieFeeAmount) - splitInvoiceAmount;
+          splitTotalFees = splitStripeFeesAmount + splitCookieFeeAmount;
 
-          paymentPlanFinalAmount += splitTotalFinalAmount;
+          paymentPlanFinalAmount += roundUp(splitTotalFinalAmount);
           paymentPlanFinalCookieFees += splitCookieFeeAmount;
           paymentPlanFinalStripeFees += splitStripeFeesAmount;
 
@@ -258,15 +258,15 @@
               <div class="card-header bg-secondary">Payment Split ${i}</div>
               <ul class="list-group list-group-flush">
                 <li class="list-group-item">Invoice Amount: $${splitInvoiceAmount.toFixed(2)}</li>
-                <li class="list-group-item">Stripe Fees: $${splitStripeFeesAmountFixed.toFixed(2)}</li>
+                <li class="list-group-item">Stripe Fees: $${splitStripeFeesAmount.toFixed(2)}</li>
                 <li class="list-group-item">Cookie Fee: $${splitCookieFeeAmount.toFixed(2)}</li>
-                <li class="list-group-item">Total Fees: $${splitTotalFeesFixed.toFixed(2)}</li>
+                <li class="list-group-item">Total Fees: $${splitTotalFees.toFixed(2)}</li>
                 <li class="list-group-item">Total Final Amount: $${roundUp(splitTotalFinalAmount).toFixed(2)}</li>
               </ul>
             </div>
           `);
         }
-
+       
         if (paymentPlanFinalAmount > 0) {
           $("#paymentplantotalamount").text("$" + paymentPlanFinalAmount.toFixed(2));
           $("#paymentplantotalcookiefees").text("$" + paymentPlanFinalCookieFees.toFixed(2));
