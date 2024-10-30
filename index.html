@@ -210,6 +210,7 @@
       const factor = 10 ** places;
       return Math.ceil(num * factor) / factor;
     }
+    
 
     $(document).ready(function() {
       $(".paymentplantotals").hide();
@@ -234,6 +235,9 @@
     $("#totalFees").text("$" + totalFees.toFixed(2));
     $("#totalFinalAmount").text("$" + totalFinalAmount.toFixed(2));
 
+    // Calculate total fees for all splits
+    var totalSplitFees = totalFees * paymentSplits;
+
     // Update payment splits container
     $("#paymentSplitsContainer").empty();
     var splitInvoiceAmount = invoiceAmount / paymentSplits;
@@ -243,9 +247,11 @@
     for (var i = 1; i <= paymentSplits; i++) {
       var splitTotalFeeRate = stripeCommissionRate + cookieFeeRate;
       var splitFinalAmount = roundUp(splitInvoiceAmount / (1 - totalFeeRate), 2);
-      var splitStripeFeesAmount = roundUp(stripeCommissionRate * splitFinalAmount + stripeFixedFee, 2);
-      var splitCookieFeeAmount = roundUp(cookieFeeRate * splitFinalAmount, 2);
-      var splitTotalFees = roundUp(splitStripeFeesAmount + splitCookieFeeAmount , 2);
+      var splitStripeFeesAmount = stripeCommissionRate * splitFinalAmount + stripeFixedFee;
+      var splitCookieFeeAmount = cookieFeeRate * splitFinalAmount;
+      var splitUnroundedFees = splitStripeFeesAmount + splitCookieFeeAmount;
+      var splitRoundsplitTotalFeesedFee = Math.ceil(splitUnroundedFees * 100) / 100;
+      var splitTotalFees = splitRoundsplitTotalFeesedFee;
       var splitTotalFinalAmount = roundUp(splitInvoiceAmount + splitTotalFees, 2);
       paymentPlanFinalAmount += splitTotalFinalAmount;
       paymentPlanFinalCookieFees += splitCookieFeeAmount;
