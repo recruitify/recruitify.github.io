@@ -167,31 +167,31 @@
               </div>
               <div class="highlight">
                   <div class="code-block">
-                      <pre><code class="language-javascript">const finalAmount = roundUp(invoiceAmount / (1 - totalFeeRate), 2);</code></pre>
+                      <pre><code class="language-javascript">const finalAmount = roundUp(invoiceAmount / (1 - totalFeeRate));</code></pre>
                       <p>This calculates the total amount the customer will actually pay, including fees.</p>
                   </div>
               </div>
               <div class="highlight">
                   <div class="code-block">
-                      <pre><code class="language-javascript">const stripeFeesAmount = roundUp(stripeCommissionRate * finalAmount + stripeFixedFee, 2);</code></pre>
+                      <pre><code class="language-javascript">const stripeFeesAmount = roundUp(stripeCommissionRate * finalAmount + stripeFixedFee);</code></pre>
                       <p>This calculates the total amount of Stripe fees, including both the commission and fixed fee.</p>
                   </div>
               </div>
               <div class="highlight">
                   <div class="code-block">
-                      <pre><code class="language-javascript">const cookieFeeAmount = roundUp(cookieFeeRate * finalAmount, 2);</code></pre>
+                      <pre><code class="language-javascript">const cookieFeeAmount = roundUp(cookieFeeRate * finalAmount);</code></pre>
                       <p>This calculates the total amount of Cookie fees.</p>
                   </div>
               </div>
               <div class="highlight">
                   <div class="code-block">
-                      <pre><code class="language-javascript">const totalFees = roundUp(stripeFeesAmount + cookieFeeAmount, 2);</code></pre>
+                      <pre><code class="language-javascript">const totalFees = roundUp(stripeFeesAmount + cookieFeeAmount);</code></pre>
                       <p>This calculates the sum of Stripe fees and Cookie fees.</p>
                   </div>
               </div>
               <div class="highlight">
                   <div class="code-block">
-                      <pre><code class="language-javascript">const totalFinalAmount = roundUp(invoiceAmount + totalFees, 2);</code></pre>
+                      <pre><code class="language-javascript">const totalFinalAmount = roundUp(invoiceAmount + totalFees);</code></pre>
                       <p>This calculates the final amount the customer will pay, which is the invoice amount plus the total fees.</p>
                   </div>
               </div>
@@ -206,9 +206,8 @@
 
 
   <script>
-    function roundUp(num, places) {
-      const factor = 10 ** places;
-      return Math.ceil(num * factor) / factor;
+    function roundUp(num) {
+      return Math.ceil(num * 100) / 100;
     }
 
     $(document).ready(function() {
@@ -222,9 +221,9 @@
         var cookieFeeRate = 0.0146;
 
         var totalFeeRate = stripeCommissionRate + cookieFeeRate;
-        var finalAmount = roundUp(invoiceAmount / (1 - totalFeeRate), 2);
-        var stripeFeesAmount = roundUp(stripeCommissionRate * finalAmount + stripeFixedFee, 2);
-        var cookieFeeAmount = roundUp(cookieFeeRate * finalAmount, 2);
+        var finalAmount = roundUp(invoiceAmount / (1 - totalFeeRate));
+        var stripeFeesAmount = roundUp(stripeCommissionRate * finalAmount + stripeFixedFee);
+        var cookieFeeAmount = roundUp(cookieFeeRate * finalAmount);
         var totalFees = stripeFeesAmount + cookieFeeAmount;
         var totalFinalAmount = invoiceAmount + totalFees;
 
@@ -241,12 +240,15 @@
         var paymentPlanFinalCookieFees = 0;
         var paymentPlanFinalStripeFees = 0;
         for (var i = 1; i <= paymentSplits; i++) {
-          var splitTotalFeeRate = stripeCommissionRate + cookieFeeRate;
-          var splitFinalAmount = roundUp(splitInvoiceAmount / (1 - totalFeeRate), 2);
-          var splitStripeFeesAmount = stripeCommissionRate * splitFinalAmount + stripeFixedFee;
-          var splitCookieFeeAmount = cookieFeeRate * splitFinalAmount;
-          var splitTotalFees = roundUp(splitStripeFeesAmount + splitCookieFeeAmount, 3);
+          var splitFinalAmount = roundUp(splitInvoiceAmount / (1 - totalFeeRate));
+          var splitStripeFeesAmount = roundUp(stripeCommissionRate * splitFinalAmount + stripeFixedFee);
+          var splitCookieFeeAmount = roundUp(cookieFeeRate * splitFinalAmount);
+          var splitTotalFees = roundUp(splitStripeFeesAmount + splitCookieFeeAmount);
           var splitTotalFinalAmount = splitInvoiceAmount + splitTotalFees;
+
+          var splitStripeFeesAmountFixed = roundUp(splitTotalFinalAmount - splitCookieFeeAmount) - splitInvoiceAmount;
+          var splitTotalFeesFixed = splitStripeFeesAmountFixed + splitCookieFeeAmount;
+
           paymentPlanFinalAmount += splitTotalFinalAmount;
           paymentPlanFinalCookieFees += splitCookieFeeAmount;
           paymentPlanFinalStripeFees += splitStripeFeesAmount;
@@ -256,10 +258,10 @@
               <div class="card-header bg-secondary">Payment Split ${i}</div>
               <ul class="list-group list-group-flush">
                 <li class="list-group-item">Invoice Amount: $${splitInvoiceAmount.toFixed(2)}</li>
-                <li class="list-group-item">Stripe Fees: $${splitStripeFeesAmount.toFixed(2)}</li>
+                <li class="list-group-item">Stripe Fees: $${splitStripeFeesAmountFixed.toFixed(2)}</li>
                 <li class="list-group-item">Cookie Fee: $${splitCookieFeeAmount.toFixed(2)}</li>
-                <li class="list-group-item">Total Fees: $${splitTotalFees.toFixed(2)}</li>
-                <li class="list-group-item">Total Final Amount: $${splitTotalFinalAmount.toFixed(2)}</li>
+                <li class="list-group-item">Total Fees: $${splitTotalFeesFixed.toFixed(2)}</li>
+                <li class="list-group-item">Total Final Amount: $${roundUp(splitTotalFinalAmount).toFixed(2)}</li>
               </ul>
             </div>
           `);
@@ -274,7 +276,7 @@
           $(".paymentplantotals").hide();
         }
     });
-    });
+  });
   </script>
 </body>
 </html>
