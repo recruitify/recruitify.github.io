@@ -210,82 +210,70 @@
       const factor = 10 ** places;
       return Math.ceil(num * factor) / factor;
     }
-    
 
     $(document).ready(function() {
       $(".paymentplantotals").hide();
       $("#invoiceAmount, #paymentSplits").on("input", function() {
-    var invoiceAmount = parseFloat($("#invoiceAmount").val());
-    var paymentSplits = parseInt($("#paymentSplits").val());
+        var invoiceAmount = parseFloat($("#invoiceAmount").val());
+        var paymentSplits = parseInt($("#paymentSplits").val());
 
-    var stripeCommissionRate = 0.029;
-    var stripeFixedFee = 0.30;
-    var cookieFeeRate = 0.0146;
+        var stripeCommissionRate = 0.029;
+        var stripeFixedFee = 0.30;
+        var cookieFeeRate = 0.0146;
 
-    var totalFeeRate = stripeCommissionRate + cookieFeeRate;
-    var finalAmount = roundUp(invoiceAmount / (1 - totalFeeRate), 2);
-    var stripeFeesAmount = roundUp(stripeCommissionRate * finalAmount + stripeFixedFee, 2);
-    var cookieFeeAmount = roundUp(cookieFeeRate * finalAmount, 2);
-    var totalFees = roundUp(stripeFeesAmount + cookieFeeAmount , 2);
-    var totalFinalAmount = roundUp(invoiceAmount + totalFees, 2);
+        var totalFeeRate = stripeCommissionRate + cookieFeeRate;
+        var finalAmount = roundUp(invoiceAmount / (1 - totalFeeRate), 2);
+        var stripeFeesAmount = roundUp(stripeCommissionRate * finalAmount + stripeFixedFee, 2);
+        var cookieFeeAmount = roundUp(cookieFeeRate * finalAmount, 2);
+        var totalFees = stripeFeesAmount + cookieFeeAmount;
+        var totalFinalAmount = invoiceAmount + totalFees;
 
-    // Update totals section
-    $("#stripeFeesAmount").text("$" + stripeFeesAmount.toFixed(2));
-    $("#cookieFeeAmount").text("$" + cookieFeeAmount.toFixed(2));
-    $("#totalFees").text("$" + totalFees.toFixed(2));
-    $("#totalFinalAmount").text("$" + totalFinalAmount.toFixed(2));
+        // Update totals section
+        $("#stripeFeesAmount").text("$" + stripeFeesAmount.toFixed(2));
+        $("#cookieFeeAmount").text("$" + cookieFeeAmount.toFixed(2));
+        $("#totalFees").text("$" + totalFees.toFixed(2));
+        $("#totalFinalAmount").text("$" + totalFinalAmount.toFixed(2));
 
-    // Calculate total fees for all splits
-    var totalSplitFees = totalFees * paymentSplits;
+        // Update payment splits container
+        $("#paymentSplitsContainer").empty();
+        var splitInvoiceAmount = invoiceAmount / paymentSplits;
+        var paymentPlanFinalAmount = 0;
+        var paymentPlanFinalCookieFees = 0;
+        var paymentPlanFinalStripeFees = 0;
+        for (var i = 1; i <= paymentSplits; i++) {
+          var splitTotalFeeRate = stripeCommissionRate + cookieFeeRate;
+          var splitFinalAmount = roundUp(splitInvoiceAmount / (1 - totalFeeRate), 2);
+          var splitStripeFeesAmount = stripeCommissionRate * splitFinalAmount + stripeFixedFee;
+          var splitCookieFeeAmount = cookieFeeRate * splitFinalAmount;
+          var splitTotalFees = roundUp(splitStripeFeesAmount + splitCookieFeeAmount, 3);
+          var splitTotalFinalAmount = splitInvoiceAmount + splitTotalFees;
+          paymentPlanFinalAmount += splitTotalFinalAmount;
+          paymentPlanFinalCookieFees += splitCookieFeeAmount;
+          paymentPlanFinalStripeFees += splitStripeFeesAmount;
 
-    // Update payment splits container
-    $("#paymentSplitsContainer").empty();
-    var splitInvoiceAmount = invoiceAmount / paymentSplits;
-    var paymentPlanFinalAmount = 0;
-    var paymentPlanFinalCookieFees = 0;
-    var paymentPlanFinalStripeFees = 0;
-    for (var i = 1; i <= paymentSplits; i++) {
-      var splitTotalFeeRate = stripeCommissionRate + cookieFeeRate;
-      var splitFinalAmount = roundUp(splitInvoiceAmount / (1 - totalFeeRate), 2);
-      
-      var splitUnroundedStripeFeesAmount = stripeCommissionRate * splitFinalAmount + stripeFixedFee;
-      var splitUnroundedCookieFeeAmount = cookieFeeRate * splitFinalAmount;
-      var splitUnroundedFees = splitStripeFeesAmount + splitCookieFeeAmount;
-      var splitRoundsplitTotalFeesedFee = Math.ceil(splitUnroundedFees * 100) / 100;
-      var splitTotalFees = splitRoundsplitTotalFeesedFee;
+          $("#paymentSplitsContainer").append(`
+            <div class="card payment-split">
+              <div class="card-header bg-secondary">Payment Split ${i}</div>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">Invoice Amount: $${splitInvoiceAmount.toFixed(2)}</li>
+                <li class="list-group-item">Stripe Fees: $${splitStripeFeesAmount.toFixed(2)}</li>
+                <li class="list-group-item">Cookie Fee: $${splitCookieFeeAmount.toFixed(2)}</li>
+                <li class="list-group-item">Total Fees: $${splitTotalFees.toFixed(2)}</li>
+                <li class="list-group-item">Total Final Amount: $${splitTotalFinalAmount.toFixed(2)}</li>
+              </ul>
+            </div>
+          `);
+        }
 
-      var splitStripeFeesAmount = roundUp(splitUnroundedStripeFeesAmount, 2);
-      var splitCookieFeeAmount = roundUp(splitUnroundedCookieFeeAmount, 2);
-      
-      
-      var splitTotalFinalAmount = roundUp(splitInvoiceAmount + splitTotalFees, 2);
-      paymentPlanFinalAmount += splitTotalFinalAmount;
-      paymentPlanFinalCookieFees += splitCookieFeeAmount;
-      paymentPlanFinalStripeFees += splitStripeFeesAmount;
-
-      $("#paymentSplitsContainer").append(`
-        <div class="card payment-split">
-          <div class="card-header bg-secondary">Payment Split ${i}</div>
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item">Invoice Amount: $${splitInvoiceAmount.toFixed(2)}</li>
-            <li class="list-group-item">Stripe Fees: $${splitStripeFeesAmount.toFixed(2)}</li>
-            <li class="list-group-item">Cookie Fee: $${splitCookieFeeAmount.toFixed(2)}</li>
-            <li class="list-group-item">Total Fees: $${splitTotalFees.toFixed(2)}</li>
-            <li class="list-group-item">Total Final Amount: $${splitTotalFinalAmount.toFixed(2)}</li>
-          </ul>
-        </div>
-      `);
-    }
-
-    if (paymentPlanFinalAmount > 0) {
-      $("#paymentplantotalamount").text("$" + paymentPlanFinalAmount.toFixed(2));
-      $("#paymentplantotalcookiefees").text("$" + paymentPlanFinalCookieFees.toFixed(2));
-      $("#paymentplantotalstripefees").text("$" + paymentPlanFinalStripeFees.toFixed(2));
-      $(".paymentplantotals").show();
-    } else {
-      $(".paymentplantotals").hide();
-    }
-});
+        if (paymentPlanFinalAmount > 0) {
+          $("#paymentplantotalamount").text("$" + paymentPlanFinalAmount.toFixed(2));
+          $("#paymentplantotalcookiefees").text("$" + paymentPlanFinalCookieFees.toFixed(2));
+          $("#paymentplantotalstripefees").text("$" + paymentPlanFinalStripeFees.toFixed(2));
+          $(".paymentplantotals").show();
+        } else {
+          $(".paymentplantotals").hide();
+        }
+    });
     });
   </script>
 </body>
