@@ -247,11 +247,17 @@
     for (var i = 1; i <= paymentSplits; i++) {
       var splitTotalFeeRate = stripeCommissionRate + cookieFeeRate;
       var splitFinalAmount = roundUp(splitInvoiceAmount / (1 - totalFeeRate), 2);
-      var splitStripeFeesAmount = stripeCommissionRate * splitFinalAmount + stripeFixedFee;
-      var splitCookieFeeAmount = cookieFeeRate * splitFinalAmount;
+      
+      var splitUnroundedStripeFeesAmount = stripeCommissionRate * splitFinalAmount + stripeFixedFee;
+      var splitUnroundedCookieFeeAmount = cookieFeeRate * splitFinalAmount;
       var splitUnroundedFees = splitStripeFeesAmount + splitCookieFeeAmount;
       var splitRoundsplitTotalFeesedFee = Math.ceil(splitUnroundedFees * 100) / 100;
       var splitTotalFees = splitRoundsplitTotalFeesedFee;
+
+      var splitStripeFeesAmount = roundUp(splitUnroundedStripeFeesAmount, 2);
+      var splitCookieFeeAmount = roundUp(splitUnroundedCookieFeeAmount, 2);
+      
+      
       var splitTotalFinalAmount = roundUp(splitInvoiceAmount + splitTotalFees, 2);
       paymentPlanFinalAmount += splitTotalFinalAmount;
       paymentPlanFinalCookieFees += splitCookieFeeAmount;
