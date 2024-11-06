@@ -148,7 +148,7 @@
     <div class="row">
       <div class="col-md-12">
         <div id="explanation" class="mt-4">
-          <h5 class="text-center">Explanation of the Calculation</h5>
+          <h5 class="text-center">Javascript Calculations</h5>
           <div class="card">
               <div class="card-body">
           <p>The calculator determines the total fees and final amount based on the following inputs:</p>
@@ -161,38 +161,28 @@
                   <p>The calculations are as follows:</p>
               <div class="highlight">
                   <div class="code-block">
-                      <pre><code class="language-javascript">const totalFeeRate = stripeCommissionRate + cookieFeeRate;</code></pre>
-                      <p>This calculates the combined percentage of Stripe and Cookie fees.</p>
-                  </div>
-              </div>
-              <div class="highlight">
-                  <div class="code-block">
-                      <pre><code class="language-javascript">const finalAmount = roundUp(invoiceAmount / (1 - totalFeeRate));</code></pre>
-                      <p>This calculates the total amount the customer will actually pay, including fees.</p>
-                  </div>
-              </div>
-              <div class="highlight">
-                  <div class="code-block">
-                      <pre><code class="language-javascript">const stripeFeesAmount = roundUp(stripeCommissionRate * finalAmount + stripeFixedFee);</code></pre>
-                      <p>This calculates the total amount of Stripe fees, including both the commission and fixed fee.</p>
-                  </div>
-              </div>
-              <div class="highlight">
-                  <div class="code-block">
-                      <pre><code class="language-javascript">const cookieFeeAmount = roundUp(cookieFeeRate * finalAmount);</code></pre>
-                      <p>This calculates the total amount of Cookie fees.</p>
-                  </div>
-              </div>
-              <div class="highlight">
-                  <div class="code-block">
-                      <pre><code class="language-javascript">const totalFees = roundUp(stripeFeesAmount + cookieFeeAmount);</code></pre>
-                      <p>This calculates the sum of Stripe fees and Cookie fees.</p>
-                  </div>
-              </div>
-              <div class="highlight">
-                  <div class="code-block">
-                      <pre><code class="language-javascript">const totalFinalAmount = roundUp(invoiceAmount + totalFees);</code></pre>
-                      <p>This calculates the final amount the customer will pay, which is the invoice amount plus the total fees.</p>
+                      <pre><code class="language-javascript">
+    var stripeCommissionRate = 0.029;
+    var stripeFixedFee = 0.30;
+    var cookieFeeRate = 0.0146;
+
+    function calculateFees(netAmount) {
+      // Calculate gross amount
+      var grossAmount = (netAmount + stripeFixedFee) / (1 - stripeCommissionRate - cookieFeeRate);
+
+      // Calculate total fees
+      var totalFees = grossAmount - netAmount;
+
+      // Calculate individual fees
+      var stripeFee = stripeFixedFee + (grossAmount * stripeCommissionRate);
+      var cookieFee = grossAmount * cookieFeeRate;
+      return {
+        grossAmount: grossAmount,
+        stripeFee: stripeFee,
+        cookieFee: cookieFee,
+      };
+    }
+                      </code></pre>
                   </div>
               </div>
             <p>For each payment split, the same calculations are performed using the split invoice amount.</p>
