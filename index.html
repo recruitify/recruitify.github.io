@@ -206,8 +206,25 @@
 
 
   <script>
-    function roundUp(num) {
-      return Math.ceil(num * 100) / 100;
+    var stripeCommissionRate = 0.029;
+    var stripeFixedFee = 0.30;
+    var cookieFeeRate = 0.0146;
+
+    function calculateFees(netAmount) {
+      // Calculate gross amount
+      var grossAmount = (netAmount + stripeFixedFee) / (1 - stripeCommissionRate - cookieFeeRate);
+
+      // Calculate total fees
+      var totalFees = grossAmount - netAmount;
+
+      // Calculate individual fees
+      var stripeFee = stripeFixedFee + (grossAmount * stripeCommissionRate);
+      var cookieFee = grossAmount * cookieFeeRate;
+      return {
+        grossAmount: grossAmount,
+        stripeFee: stripeFee,
+        cookieFee: cookieFee,
+      };
     }
 
     $(document).ready(function() {
@@ -215,53 +232,39 @@
       $("#invoiceAmount, #paymentSplits").on("input", function() {
         var invoiceAmount = parseFloat($("#invoiceAmount").val());
         var paymentSplits = parseInt($("#paymentSplits").val());
+        var splitInvoiceAmount = invoiceAmount / paymentSplits;
 
-        var stripeCommissionRate = 0.029;
-        var stripeFixedFee = 0.30;
-        var cookieFeeRate = 0.0146;
-
-        var totalFeeRate = stripeCommissionRate + cookieFeeRate;
-        var finalAmount = roundUp(invoiceAmount / (1 - totalFeeRate));
-        var stripeFeesAmount = roundUp(stripeCommissionRate * finalAmount + stripeFixedFee);
-        var cookieFeeAmount = roundUp(cookieFeeRate * finalAmount);
-        var totalFees = stripeFeesAmount + cookieFeeAmount;
-        var totalFinalAmount = invoiceAmount + totalFees;
-
+        var fees = calculateFees(invoiceAmount);
+        var totalFees = fees.stripeFee + fees.cookieFee;
+        
         // Update totals section
-        $("#stripeFeesAmount").text("$" + stripeFeesAmount.toFixed(2));
-        $("#cookieFeeAmount").text("$" + cookieFeeAmount.toFixed(2));
+        $("#stripeFeesAmount").text("$" + fees.stripeFee.toFixed(2));
+        $("#cookieFeeAmount").text("$" + fees.cookieFee.toFixed(2));
         $("#totalFees").text("$" + totalFees.toFixed(2));
-        $("#totalFinalAmount").text("$" + totalFinalAmount.toFixed(2));
+        $("#totalFinalAmount").text("$" + fees.grossAmount.toFixed(2));
+
 
         // Update payment splits container
         $("#paymentSplitsContainer").empty();
-        var splitInvoiceAmount = invoiceAmount / paymentSplits;
-        var paymentPlanFinalAmount = 0;
         var paymentPlanFinalCookieFees = 0;
         var paymentPlanFinalStripeFees = 0;
+
+        var splitFees = calculateFees(splitInvoiceAmount);
+        var totalSingleSplitFees = splitFees.stripeFee + splitFees.cookieFee;
+        var paymentPlanFinalAmount = splitFees.grossAmount * paymentSplits;
+        var paymentPlanFinalStripeFees = splitFees.stripeFee * paymentSplits;
+        var paymentPlanFinalCookieFees = splitFees.cookieFee * paymentSplits;
+
         for (var i = 1; i <= paymentSplits; i++) {
-          var splitFinalAmount = roundUp(splitInvoiceAmount / (1 - totalFeeRate));
-          var splitStripeFeesAmount = roundUp(stripeCommissionRate * splitFinalAmount + stripeFixedFee);
-          var splitCookieFeeAmount = roundUp(cookieFeeRate * splitFinalAmount);
-          var splitTotalFees = roundUp(splitStripeFeesAmount + splitCookieFeeAmount);
-          var splitTotalFinalAmount = splitInvoiceAmount + splitTotalFees;
-
-          splitStripeFeesAmount = roundUp(splitTotalFinalAmount - splitCookieFeeAmount) - splitInvoiceAmount;
-          splitTotalFees = splitStripeFeesAmount + splitCookieFeeAmount;
-
-          paymentPlanFinalAmount += roundUp(splitTotalFinalAmount);
-          paymentPlanFinalCookieFees += splitCookieFeeAmount;
-          paymentPlanFinalStripeFees += splitStripeFeesAmount;
-
           $("#paymentSplitsContainer").append(`
             <div class="card payment-split">
               <div class="card-header bg-secondary">Payment Split ${i}</div>
               <ul class="list-group list-group-flush">
                 <li class="list-group-item">Invoice Amount: $${splitInvoiceAmount.toFixed(2)}</li>
-                <li class="list-group-item">Stripe Fees: $${splitStripeFeesAmount.toFixed(2)}</li>
-                <li class="list-group-item">Cookie Fee: $${splitCookieFeeAmount.toFixed(2)}</li>
-                <li class="list-group-item">Total Fees: $${splitTotalFees.toFixed(2)}</li>
-                <li class="list-group-item">Total Final Amount: $${roundUp(splitTotalFinalAmount).toFixed(2)}</li>
+                <li class="list-group-item">Stripe Fees: $${splitFees.stripeFee.toFixed(2)}</li>
+                <li class="list-group-item">Cookie Fee: $${splitFees.cookieFee.toFixed(2)}</li>
+                <li class="list-group-item">Total Fees: $${totalSingleSplitFees.toFixed(2)}</li>
+                <li class="list-group-item">Total Final Amount: $${splitFees.grossAmount.toFixed(2)}</li>
               </ul>
             </div>
           `);
