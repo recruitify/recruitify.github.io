@@ -200,20 +200,27 @@
     var stripeFixedFee = 0.30;
     var cookieFeeRate = 0.0146;
 
+    function mathFloor(v) {
+      return Math.floor(v * 100) / 100;
+    }
+
     function calculateFees(netAmount) {
       // Calculate gross amount
       var grossAmount = (netAmount + stripeFixedFee) / (1 - stripeCommissionRate - cookieFeeRate);
-
+      grossAmount = mathFloor(grossAmount);
+      
       // Calculate total fees
       var totalFees = grossAmount - netAmount;
 
       // Calculate individual fees
       var stripeFee = stripeFixedFee + (grossAmount * stripeCommissionRate);
       var cookieFee = grossAmount * cookieFeeRate;
+
       return {
         grossAmount: grossAmount,
         stripeFee: stripeFee,
         cookieFee: cookieFee,
+        totalFees: totalFees,
       };
     }
 
@@ -225,12 +232,12 @@
         var splitInvoiceAmount = invoiceAmount / paymentSplits;
 
         var fees = calculateFees(invoiceAmount);
-        var totalFees = fees.stripeFee + fees.cookieFee;
+
         
         // Update totals section
         $("#stripeFeesAmount").text("$" + fees.stripeFee.toFixed(2));
         $("#cookieFeeAmount").text("$" + fees.cookieFee.toFixed(2));
-        $("#totalFees").text("$" + totalFees.toFixed(2));
+        $("#totalFees").text("$" + fees.totalFees.toFixed(2));
         $("#totalFinalAmount").text("$" + fees.grossAmount.toFixed(2));
 
 
@@ -240,7 +247,6 @@
         var paymentPlanFinalStripeFees = 0;
 
         var splitFees = calculateFees(splitInvoiceAmount);
-        var totalSingleSplitFees = splitFees.stripeFee + splitFees.cookieFee;
         var paymentPlanFinalAmount = splitFees.grossAmount * paymentSplits;
         var paymentPlanFinalStripeFees = splitFees.stripeFee * paymentSplits;
         var paymentPlanFinalCookieFees = splitFees.cookieFee * paymentSplits;
@@ -253,7 +259,7 @@
                 <li class="list-group-item">Invoice Amount: $${splitInvoiceAmount.toFixed(2)}</li>
                 <li class="list-group-item">Stripe Fees: $${splitFees.stripeFee.toFixed(2)}</li>
                 <li class="list-group-item">Cookie Fee: $${splitFees.cookieFee.toFixed(2)}</li>
-                <li class="list-group-item">Total Fees: $${totalSingleSplitFees.toFixed(2)}</li>
+                <li class="list-group-item">Total Fees: $${splitFees.totalFees.toFixed(2)}</li>
                 <li class="list-group-item">Total Final Amount: $${splitFees.grossAmount.toFixed(2)}</li>
               </ul>
             </div>
