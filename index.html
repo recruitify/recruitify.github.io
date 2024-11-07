@@ -162,26 +162,33 @@
               <div class="highlight">
                   <div class="code-block">
                       <pre><code class="language-javascript">
-    var stripeCommissionRate = 0.029;
-    var stripeFixedFee = 0.30;
-    var cookieFeeRate = 0.0146;
-
-    function calculateFees(netAmount) {
-      // Calculate gross amount
-      var grossAmount = (netAmount + stripeFixedFee) / (1 - stripeCommissionRate - cookieFeeRate);
-
-      // Calculate total fees
-      var totalFees = grossAmount - netAmount;
-
-      // Calculate individual fees
-      var stripeFee = stripeFixedFee + (grossAmount * stripeCommissionRate);
-      var cookieFee = grossAmount * cookieFeeRate;
-      return {
-        grossAmount: grossAmount,
-        stripeFee: stripeFee,
-        cookieFee: cookieFee,
-      };
-    }
+                        var stripeCommissionRate = 0.029;
+                        var stripeFixedFee = 0.30;
+                        var cookieFeeRate = 0.0146;
+                    
+                        function mathFloor(v) {
+                          return Math.floor(v * 100) / 100;
+                        }
+                    
+                        function calculateFees(netAmount) {
+                          // Calculate gross amount
+                          var grossAmount = (netAmount + stripeFixedFee) / (1 - stripeCommissionRate - cookieFeeRate);
+                          grossAmount = mathFloor(grossAmount);
+                          
+                          // Calculate total fees
+                          var totalFees = grossAmount - netAmount;
+                    
+                          // Calculate individual fees
+                          var stripeFee = stripeFixedFee + (grossAmount * stripeCommissionRate);
+                          var cookieFee = grossAmount * cookieFeeRate;
+                    
+                          return {
+                            grossAmount: grossAmount,
+                            stripeFee: stripeFee,
+                            cookieFee: cookieFee,
+                            totalFees: totalFees,
+                          };
+                        }
                       </code></pre>
                   </div>
               </div>
