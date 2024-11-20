@@ -162,25 +162,27 @@
               <div class="highlight">
                   <div class="code-block">
                       <pre><code class="language-javascript">
-                        var stripeCommissionRate = 0.029;
-                        var stripeFixedFee = 0.30;
-                        var cookieFeeRate = 0.0146;
-                    
-                        function mathFloor(v) {
-                          return Math.floor(v * 100) / 100;
-                        }
+                        const stripeCommissionRate = 0.029;
+                        const stripeFixedFee = 0.30;
+                        const cookieFeeRate = 0.0146;
                     
                         function calculateFees(netAmount) {
-                          // Calculate gross amount
-                          var grossAmount = (netAmount + stripeFixedFee) / (1 - stripeCommissionRate - cookieFeeRate);
-                          grossAmount = mathFloor(grossAmount);
-                          
-                          // Calculate total fees
-                          var totalFees = grossAmount - netAmount;
+                          // Calculate gross amount to do calculations (reverse engeneering from Stripe's math) 
+                          let grossAmount = (netAmount + stripeFixedFee) / (1 - stripeCommissionRate - cookieFeeRate);
                     
                           // Calculate individual fees
-                          var stripeFee = stripeFixedFee + (grossAmount * stripeCommissionRate);
-                          var cookieFee = grossAmount * cookieFeeRate;
+                          let stripeFee = stripeFixedFee + (grossAmount * stripeCommissionRate);
+                          let cookieFee = grossAmount * cookieFeeRate;
+                    
+                          // Round individual fees
+                          stripeFee = parseFloat(stripeFee.toFixed(2));
+                          cookieFee = parseFloat(cookieFee.toFixed(2));
+                    
+                          // Calculate total fees
+                          let totalFees = stripeFee + cookieFee;
+                    
+                          // Calculate final gross amount from rounded amounts
+                          grossAmount = netAmount + stripeFee + cookieFee;
                     
                           return {
                             grossAmount: grossAmount,
@@ -203,25 +205,27 @@
 
 
   <script>
-    var stripeCommissionRate = 0.029;
-    var stripeFixedFee = 0.30;
-    var cookieFeeRate = 0.0146;
-
-    function mathFloor(v) {
-      return Math.floor(v * 100) / 100;
-    }
+    const stripeCommissionRate = 0.029;
+    const stripeFixedFee = 0.30;
+    const cookieFeeRate = 0.0146;
 
     function calculateFees(netAmount) {
-      // Calculate gross amount
-      var grossAmount = (netAmount + stripeFixedFee) / (1 - stripeCommissionRate - cookieFeeRate);
-      grossAmount = mathFloor(grossAmount);
-      
-      // Calculate total fees
-      var totalFees = grossAmount - netAmount;
+      // Calculate gross amount to do calculations (reverse engeneering from Stripe's math) 
+      let grossAmount = (netAmount + stripeFixedFee) / (1 - stripeCommissionRate - cookieFeeRate);
 
       // Calculate individual fees
-      var stripeFee = stripeFixedFee + (grossAmount * stripeCommissionRate);
-      var cookieFee = grossAmount * cookieFeeRate;
+      let stripeFee = stripeFixedFee + (grossAmount * stripeCommissionRate);
+      let cookieFee = grossAmount * cookieFeeRate;
+
+      // Round individual fees
+      stripeFee = parseFloat(stripeFee.toFixed(2));
+      cookieFee = parseFloat(cookieFee.toFixed(2));
+
+      // Calculate total fees
+      let totalFees = stripeFee + cookieFee;
+
+      // Calculate final gross amount from rounded amounts
+      grossAmount = netAmount + stripeFee + cookieFee;
 
       return {
         grossAmount: grossAmount,
@@ -242,10 +246,10 @@
 
         
         // Update totals section
-        $("#stripeFeesAmount").text("$" + fees.stripeFee.toFixed(2));
-        $("#cookieFeeAmount").text("$" + fees.cookieFee.toFixed(2));
-        $("#totalFees").text("$" + fees.totalFees.toFixed(2));
-        $("#totalFinalAmount").text("$" + fees.grossAmount.toFixed(2));
+        $("#stripeFeesAmount").text("$" + fees.stripeFee);
+        $("#cookieFeeAmount").text("$" + fees.cookieFee);
+        $("#totalFees").text("$" + fees.totalFees);
+        $("#totalFinalAmount").text("$" + fees.grossAmount);
 
 
         // Update payment splits container
@@ -264,10 +268,10 @@
               <div class="card-header bg-secondary">Payment Split ${i}</div>
               <ul class="list-group list-group-flush">
                 <li class="list-group-item">Invoice Amount: $${splitInvoiceAmount.toFixed(2)}</li>
-                <li class="list-group-item">Stripe Fees: $${splitFees.stripeFee.toFixed(2)}</li>
-                <li class="list-group-item">Cookie Fee: $${splitFees.cookieFee.toFixed(2)}</li>
-                <li class="list-group-item">Total Fees: $${splitFees.totalFees.toFixed(2)}</li>
-                <li class="list-group-item">Total Final Amount: $${splitFees.grossAmount.toFixed(2)}</li>
+                <li class="list-group-item">Stripe Fees: $${splitFees.stripeFee}</li>
+                <li class="list-group-item">Cookie Fee: $${splitFees.cookieFee}</li>
+                <li class="list-group-item">Total Fees: $${splitFees.totalFees}</li>
+                <li class="list-group-item">Total Final Amount: $${splitFees.grossAmount}</li>
               </ul>
             </div>
           `);
