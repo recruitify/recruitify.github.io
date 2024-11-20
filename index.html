@@ -112,6 +112,9 @@
             </div>
           </div>
           <div class="col-md-6">
+            <div class="card" id="reversed-engeneering">
+              
+            </div>
             <div class="card">
               <div class="card-header bg-primary">Percentage Fees</div>
               <div class="card-body">
@@ -226,9 +229,33 @@
 
       // Calculate final gross amount from rounded amounts
       grossAmount = netAmount + stripeFee + cookieFee;
-
+      grossAmount = parseFloat(grossAmount.toFixed(2));
       return {
         grossAmount: grossAmount,
+        stripeFee: stripeFee,
+        cookieFee: cookieFee,
+        totalFees: totalFees,
+      };
+    }
+
+    function calculateNetAmount(grossAmount) {
+      // Calculate individual fees
+      let stripeFee = stripeFixedFee + (grossAmount * stripeCommissionRate);
+      let cookieFee = grossAmount * cookieFeeRate;
+
+      // Round individual fees
+      stripeFee = parseFloat(stripeFee.toFixed(2));
+      cookieFee = parseFloat(cookieFee.toFixed(2));
+
+      // Calculate total fees
+      let totalFees = stripeFee + cookieFee;
+
+      // Calculate net amount
+      let netAmount = grossAmount - totalFees;
+      netAmount = parseFloat(netAmount.toFixed(2));
+
+      return {
+        netAmount: netAmount,
         stripeFee: stripeFee,
         cookieFee: cookieFee,
         totalFees: totalFees,
@@ -243,6 +270,38 @@
         var splitInvoiceAmount = invoiceAmount / paymentSplits;
 
         var fees = calculateFees(invoiceAmount);
+        var reversed = calculateNetAmount(fees.grossAmount);
+
+      // Update reversed container
+      $("#reversed-engeneering").html(`
+      <div class="card-header bg-light">Reversed Engeneering</div>
+              <div class="card-body">
+                <table class="table">
+                  <tbody>
+                    <tr>
+                      <th>Stripe Fee:</th>
+                      <td  style="background-color: ${reversed.stripeFee === fees.stripeFee ? 'lavender' : 'darksalmon'}"><span>$${reversed.stripeFee}</span></td>
+                    </tr>
+                    <tr>
+                      <th>Cookie Fee:</th>
+                      <td style="background-color: ${reversed.cookieFee === fees.cookieFee ? 'lavender' : 'darksalmon'}"><span >$${reversed.cookieFee}</span></td>
+                    </tr>
+                    <tr>
+                      <th>Total Fees:</th>
+                      <td style="background-color: ${reversed.totalFees === fees.totalFees ? 'lavender' : 'darksalmon'}"><span >$${reversed.totalFees}</span></td>
+                    </tr>
+                    <tr>
+                      <th>Gross Amount:</th>
+                      <td style="background-color: ${fees.grossAmount === fees.grossAmount ? 'lavender' : 'darksalmon'}"><span >$${fees.grossAmount}</span></td>
+                    </tr>
+                    <tr>
+                      <th>Net Amount:</th>
+                      <td style="background-color: ${reversed.netAmount === invoiceAmount ? 'lavender' : 'darksalmon'}"><span >$${reversed.netAmount}</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+      `);
 
         
         // Update totals section
